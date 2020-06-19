@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Fish
+function fish_conf() {
+    mkdir -p ~/.config/fish
+    ln -s $PWD/config/fish/config.fish ~/.config/fish/config.fish
+    ln -s $PWD/config/fish/functions ~/.config/fish/functions
+}
+
 # Neovim
 function nvim_conf() {
     mkdir -p ~/.config/nvim
@@ -22,6 +29,7 @@ function alacritty_conf() {
 }
 
 function main() {
+    fish_conf
     nvim_conf
     alacritty_conf
 }
