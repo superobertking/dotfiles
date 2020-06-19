@@ -8,8 +8,22 @@ function nvim_conf() {
     ln -s $PWD/config/nvim/init.vim ~/.vimrc
 }
 
+# Alacritty
+function alacritty_conf() {
+    local name
+    if [[ $(uname -s) == "Darwin" ]]; then
+        name=macos
+    else
+        name=linux
+    fi
+
+    mkdir -p ~/.config/alacritty
+    ln -s $PWD/config/alacritty/${name}.yml ~/.config/alacritty/alacritty.yml
+}
+
 function main() {
     nvim_conf
+    alacritty_conf
 }
 
 main

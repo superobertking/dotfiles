@@ -1,0 +1,9 @@
+#!/bin/bash
+# This is a legacy help file for old alacritty on macOS
+
+gpu_state=$(pmset -g | awk '/gpuswitch/{print$2}')
+new_state=$((2-$gpu_state))
+echo current state $gpu_state, new state $new_state.
+
+sudo pmset -a gpuswitch $new_state
+
