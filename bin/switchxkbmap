@@ -1,0 +1,12 @@
+#!/bin/bash
+
+curr=$(setxkbmap -query | awk '/layout/{print $2}')
+
+if [[ $curr == 'us' ]]; then
+    setxkbmap dvorak
+elif [[ $curr == 'dvorak' ]]; then
+    setxkbmap us
+else
+    echo 'Current layout not recognized:' $curr
+    exit 1
+fi
