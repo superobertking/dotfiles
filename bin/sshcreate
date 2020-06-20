@@ -1,0 +1,41 @@
+#!/bin/bash
+# File: sshcreate
+# Author: robertking <superobertking@icloud.com>
+# Date: 05/28/2020 01:24:22
+# Last Modified Date: 05/28/2020 01:25:09
+# Last Modified By: robertking <superobertking@icloud.com>
+
+if [[ $# -ne 4 ]]; then
+    echo "Usage: sshcreate <alias> <user> <host> <port>"
+    exit 1;
+fi
+
+ali=$1
+user=$2
+host=$3
+port=$4
+
+# For whatever reason, ssh-keygen doesn not expand "~"...
+idfile="~/.ssh/${ali}.id_rsa"
+idfile_abs="$HOME/.ssh/${ali}.id_rsa"
+
+if [[ ! -e ${idfile_abs} ]]; then
+    echo Generating identity file at ${idfile} ...
+    ssh-keygen -t rsa -f ${idfile_abs} -N ""
+    echo File ${idfile} created.
+fi
+
+echo Coping identity file to remote server. Please enter your password.
+ssh-copy-id -i ${idfile_abs} -p ${port} ${user}@${host}
+
+cat >> ~/.ssh/config <<EOF
+
+Host ${ali}
+    HostName ${host}
+    Port ${port}
+    User ${user}
+    IdentityFile ${idfile}
+EOF
+
+echo Added entry to your ~/.ssh/config file.
+echo You are now good to go. Try \"ssh ${ali}\"
