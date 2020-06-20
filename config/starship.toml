@@ -1,0 +1,10 @@
+# Don't print a new line at the start of the prompt
+add_newline = false
+
+[git_branch]
+# symbol = "ᚠ "
+
+[directory]
+truncation_length = 0
+truncate_to_repo = false
+fish_style_pwd_dir_length = 0
