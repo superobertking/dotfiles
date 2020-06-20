@@ -1,0 +1,70 @@
+#!/bin/bash
+
+aur_base_url=https://aur.archlinux.org
+local_aur_repos=$HOME/AUR
+command_name=$(basename $0)
+
+function log() {
+    echo $@
+    $@
+}
+
+function aur_get() {
+    mkdir -p $local_aur_repos/$1
+    export http_proxy=http://127.0.0.1:1081
+    export https_proxy=http://127.0.0.1:1081
+    # set -e http_proxy
+    # set -e https_proxy
+    log git clone $aur_base_url/$1.git $local_aur_repos/$1
+}
+
+function print_help() {
+    echo "Usage: ${command_name} get|install|upgrade <packages...>"
+}
+
+function do_pkgbuild() {
+    vi PKGBUILD
+    local args=-src
+    read -p "Do you want to also install the package? (y/N) " answer
+    case ${answer:0:1} in
+        y|Y)
+            local args=-sric
+        ;;
+        * )
+        ;;
+    esac
+    log makepkg $args
+}
+
+function main() {
+    if [[ $# -lt 2 ]]; then
+        print_help
+        return
+    fi
+    case $1 in
+    get)
+        for p in "${@:2}"; do
+            aur_get $p
+        done
+        ;;
+    install)
+        for p in "${@:2}"; do
+            aur_get $p
+            cd $local_aur_repos/$p
+            do_pkgbuild
+        done
+        ;;
+    upgrade)
+        for p in "${@:2}"; do
+            cd $local_aur_repos/$p || exit 1
+            git clean -f && git pull
+            do_pkgbuild
+        done
+        ;;
+    help|*)
+        print_help
+        ;;
+    esac
+}
+
+main $@
