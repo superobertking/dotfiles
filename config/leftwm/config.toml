@@ -1,0 +1,249 @@
+modkey = "Mod4"
+workspaces = []
+# Note that #tag = #key + 1
+tags = ["Web", "Term", "2", "3", "4", "5", "6", "7", "8", "Chat", "Mail"]
+
+[[keybind]]
+command = "Execute"
+value = "rofi -show run"
+modifier = ["modkey"]
+key = "space"
+
+[[keybind]]
+command = "Execute"
+value = "/home/robertking/.myutils/bin/switchxkbmap"
+modifier = ["modkey"]
+key = "Shift_L"
+
+[[keybind]]
+command = "Execute"
+value = "gnome-screenshot"
+modifier = ["modkey", "Shift"]
+key = "3"
+
+[[keybind]]
+command = "Execute"
+value = "gnome-screenshot -a"
+modifier = ["modkey", "Shift"]
+key = "4"
+
+[[keybind]]
+command = "Execute"
+value = "gnome-screenshot -w"
+modifier = ["modkey", "Shift"]
+key = "5"
+
+[[keybind]]
+command = "FocusWorkspaceNext"
+modifier = ["modkey"]
+key = "Tab"
+
+[[keybind]]
+command = "Execute"
+value = "alacritty"
+modifier = ["modkey"]
+key = "Return"
+
+[[keybind]]
+command = "CloseWindow"
+modifier = ["modkey"]
+key = "q"
+
+[[keybind]]
+command = "SoftReload"
+modifier = ["modkey", "Shift"]
+key = "r"
+
+[[keybind]]
+command = "Execute"
+value = "pkill leftwm"
+modifier = ["modkey", "Shift"]
+key = "x"
+
+[[keybind]]
+command = "Execute"
+value = "i3lock -c 333333"
+modifier = ["modkey", "Control"]
+key = "q"
+
+# [[keybind]]
+# command = "MoveToLastWorkspace"
+# modifier = ["modkey", "Shift"]
+# key = "w"
+
+[[keybind]]
+command = "SwapTags"
+modifier = ["modkey"]
+key = "o"
+
+[[keybind]]
+command = "MoveWindowUp"
+modifier = ["modkey", "Shift"]
+key = "Up"
+
+[[keybind]]
+command = "MoveWindowDown"
+modifier = ["modkey", "Shift"]
+key = "Down"
+
+[[keybind]]
+command = "FocusWindowUp"
+modifier = ["modkey"]
+key = "Up"
+
+[[keybind]]
+command = "FocusWindowDown"
+modifier = ["modkey"]
+key = "Down"
+
+[[keybind]]
+command = "NextLayout"
+modifier = ["modkey", "Control"]
+key = "Up"
+
+[[keybind]]
+command = "PreviousLayout"
+modifier = ["modkey", "Control"]
+key = "Down"
+
+[[keybind]]
+command = "FocusWorkspaceNext"
+modifier = ["modkey"]
+key = "Right"
+
+[[keybind]]
+command = "FocusWorkspacePrevious"
+modifier = ["modkey"]
+key = "Left"
+
+[[keybind]]
+command = "GotoTag"
+value = "1"
+modifier = ["modkey"]
+key = "grave"
+
+[[keybind]]
+command = "GotoTag"
+value = "2"
+modifier = ["modkey"]
+key = "F1"
+
+[[keybind]]
+command = "GotoTag"
+value = "3"
+modifier = ["modkey"]
+key = "F2"
+
+[[keybind]]
+command = "GotoTag"
+value = "4"
+modifier = ["modkey"]
+key = "F3"
+
+[[keybind]]
+command = "GotoTag"
+value = "5"
+modifier = ["modkey"]
+key = "F4"
+
+[[keybind]]
+command = "GotoTag"
+value = "6"
+modifier = ["modkey"]
+key = "F5"
+
+[[keybind]]
+command = "GotoTag"
+value = "7"
+modifier = ["modkey"]
+key = "F6"
+
+[[keybind]]
+command = "GotoTag"
+value = "8"
+modifier = ["modkey"]
+key = "F7"
+
+[[keybind]]
+command = "GotoTag"
+value = "9"
+modifier = ["modkey"]
+key = "F8"
+
+[[keybind]]
+command = "GotoTag"
+value = "10"
+modifier = ["modkey"]
+key = "F9"
+
+[[keybind]]
+command = "GotoTag"
+value = "11"
+modifier = ["modkey"]
+key = "F10"
+
+[[keybind]]
+command = "MoveToTag"
+value = "1"
+modifier = ["modkey", "Control"]
+key = "Escape"
+
+[[keybind]]
+command = "MoveToTag"
+value = "2"
+modifier = ["modkey", "Control"]
+key = "1"
+
+[[keybind]]
+command = "MoveToTag"
+value = "3"
+modifier = ["modkey", "Control"]
+key = "2"
+
+[[keybind]]
+command = "MoveToTag"
+value = "4"
+modifier = ["modkey", "Control"]
+key = "3"
+
+[[keybind]]
+command = "MoveToTag"
+value = "5"
+modifier = ["modkey", "Control"]
+key = "4"
+
+[[keybind]]
+command = "MoveToTag"
+value = "6"
+modifier = ["modkey", "Control"]
+key = "5"
+
+[[keybind]]
+command = "MoveToTag"
+value = "7"
+modifier = ["modkey", "Control"]
+key = "6"
+
+[[keybind]]
+command = "MoveToTag"
+value = "8"
+modifier = ["modkey", "Control"]
+key = "7"
+
+[[keybind]]
+command = "MoveToTag"
+value = "9"
+modifier = ["modkey", "Control"]
+key = "8"
+
+[[keybind]]
+command = "MoveToTag"
+value = "10"
+modifier = ["modkey", "Control"]
+key = "9"
+
+[[keybind]]
+command = "MoveToTag"
+value = "11"
+modifier = ["modkey", "Control"]
+key = "0"
