@@ -1,0 +1,26 @@
+#!/bin/bash
+# This is a hack for Xorg to set different DPI on 2 displays.
+
+s1w=3840
+s1h=2160
+s1s=1
+s1v=1
+s1wp=$(($s1w*$s1v))
+s1hp=$(($s1h*$s1v))
+
+s2w=1920
+s2h=1080
+s2s=1
+s2v=1
+s2wp=$(($s2w*$s2v))
+s2hp=$(($s2h*$s2v))
+
+dpi=124
+
+xrandr --dpi $dpi --fb $(($s1wp+$s2wp))x${s1hp} \
+    --output DP-2 --mode ${s1w}x${s1h} --scale ${s1s}x${s1s} \
+    --output HDMI-3 --mode ${s2w}x${s2h} --scale ${s2s}x${s2s} --pos ${s1wp}x0 \
+        --panning ${s1wp}x${s1hp}+${s1wp}+0
+# xrandr --dpi 124 --fb 7680x2160 \
+#     --output DP-2 --mode 3840x2160 \
+#     --output HDMI-3 --scale 2x2 --pos 3840x0 --panning 3840x2160+3840+0
