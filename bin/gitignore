@@ -1,0 +1,45 @@
+#!/bin/bash
+
+GITIGNORE_REPO=$HOME/cc/Clone/gitignore
+
+function update_repo() {
+    local trepo tdate
+    trepo=$(git -C $GITIGNORE_REPO log -1 --format=%ct)
+    tdate=$(date +%s)
+    if [[ $(($tdate - $trepo)) -gt 86400 ]]; then  # secs in one day
+        git -C $GITIGNORE_REPO pull
+    fi
+}
+
+function print_help() {
+    echo "Usage: ${command_name} use|update|info|view|search <language>"
+}
+
+function main() {
+    if [[ $# -lt 2 ]] && [[ $1 -ne update ]]; then
+        print_help
+        return
+    fi
+    case $1 in
+    use)
+        cp -i $GITIGNORE_REPO/$2.gitignore .gitignore
+        ;;
+    search)
+        ls $GITIGNORE_REPO | grep -i $2
+        ;;
+    info)
+        ls -l $GITIGNORE_REPO/$2.gitignore
+        ;;
+    view)
+        vi $GITIGNORE_REPO/$2.gitignore
+        ;;
+    update)
+        update_repo
+        ;;
+    help|*)
+        print_help
+        ;;
+    esac
+}
+
+main $@
