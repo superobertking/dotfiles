@@ -1,5 +1,6 @@
 #!/bin/bash
-# This is a legacy help file for old alacritty on macOS
+# This tool toggles between integrated and auto-switch gpu options on macOS.
+# It can be used to forbid applications like Java to force enable discrete gpu.
 
 gpu_state=$(pmset -g | awk '/gpuswitch/{print$2}')
 new_state=$((2-$gpu_state))
