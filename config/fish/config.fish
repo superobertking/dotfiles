@@ -1,5 +1,6 @@
 source $HOME/.cargo/env
 [ -f /usr/local/share/autojump/autojump.fish ]; and source /usr/local/share/autojump/autojump.fish
+[ -f /usr/share/autojump/autojump.fish ]; and source /usr/share/autojump/autojump.fish
 # source /etc/modules/init/fish
 # export PATH="$PATH:/usr/lib/jvm/default/bin"
 

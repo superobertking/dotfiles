@@ -1,18 +1,37 @@
 #!/bin/bash
 
+# Utility path
+UPATH=$HOME/.myutils
+
 # Fish
 function fish_conf() {
     mkdir -p ~/.config/fish
-    ln -s $PWD/config/fish/config.fish ~/.config/fish/config.fish
-    ln -s $PWD/config/fish/functions ~/.config/fish/functions
+    ln -s $UPATH/config/fish/config.fish ~/.config/fish/config.fish
+    ln -s $UPATH/config/fish/functions ~/.config/fish/functions
+    ln -s $UPATH/config/starship.toml ~/.config/starship.toml
+    # Install omf
+    curl -L https://get.oh-my.fish | fish
+    omf install autojump fzf fzf-autojump
+    omf install https://github.com/jhillyerd/plugin-git
+    # Install fzf if needed
+    # git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    # ~/.fzf/install
 }
 
 # Neovim
 function nvim_conf() {
     mkdir -p ~/.config/nvim
-    ln -s $PWD/config/nvim/init.vim ~/.config/nvim/init.vim
+    ln -s $UPATH/config/nvim/init.vim ~/.config/nvim/init.vim
     # I also want it to be shared with fallback vim
-    ln -s $PWD/config/nvim/init.vim ~/.vimrc
+    ln -s $UPATH/config/nvim/init.vim ~/.vimrc
+    # Install vim-plugged, need to run `nvim +PlugInstall` manually
+    sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+}
+
+# Tmux
+function tmux_conf() {
+    ln -s $UPATH/config/tmux/tmux.conf ~/.tmux.conf
 }
 
 # Alacritty
@@ -25,7 +44,7 @@ function alacritty_conf() {
     fi
 
     mkdir -p ~/.config/alacritty
-    ln -s $PWD/config/alacritty/${name}.yml ~/.config/alacritty/alacritty.yml
+    ln -s $UPATH/config/alacritty/${name}.yml ~/.config/alacritty/alacritty.yml
 }
 
 # Git
@@ -49,6 +68,7 @@ function git_conf() {
 function main() {
     fish_conf
     nvim_conf
+    tmux_conf
     git_conf
     alacritty_conf
 }

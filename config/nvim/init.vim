@@ -538,9 +538,8 @@ autocmd InsertLeave * set nopaste
 
 " Axis
 highlight MatchParen term=underline cterm=underline ctermbg=NONE gui=underline guibg=NONE
-if has('nvim')
-set fcs=eob:\   " Do not show ~ for EOB in nvim. Note that it's a backslash whitespace.
-endif
+" set fcs=eob:\   " Do not show ~ for EOB in nvim. Note that it's a backslash whitespace.
+hi NonText guifg=bg
 set colorcolumn=80
 
 " Goto last closed position
