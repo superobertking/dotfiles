@@ -9,7 +9,7 @@ else
     FISH_BIN=/usr/bin/fish
 fi
 
-if $TMUX_BIN lsc -t daily > /dev/null; then
+if $TMUX_BIN lsc -t daily > /dev/null 2>&1; then
     if [ $($TMUX_BIN lsc -t daily 2> /dev/null | wc -l) -eq 0 ]; then
         $TMUX_BIN a -t daily
     fi
