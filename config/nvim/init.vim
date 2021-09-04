@@ -16,6 +16,8 @@ set inccommand=nosplit
 set autoread
 set foldclose=all
 set hlsearch
+set showcmd
+set ffs=unix
 let mapleader = "\<space>"
 set notimeout nottimeout
 nmap <leader><C-c> <NOP>
@@ -30,21 +32,36 @@ func! ToggleDvorak()
     endif
 endfunction
 " C-m is also carriage return
-nnoremap <silent> <C-m> :call ToggleDvorak()<CR>
+" nnoremap <silent> <C-m> :call ToggleDvorak()<CR>
 
 set list
 " Note the symbol tailing space: '∙' (UTF-8: e2 88 99) may be much larger
 " than '·' (UTF-8: c2 b7) in some fonts.
+" set listchars=tab:\ \ ,nbsp:¬,extends:»,precedes:«,trail:·
 " set listchars=tab:\|\ ,nbsp:¬,extends:»,precedes:«,trail:·
-set listchars=tab:>-,nbsp:¬,extends:»,precedes:«,trail:·
+set listchars=tab:\⎜\ ,nbsp:¬,extends:»,precedes:«,trail:·
+" ⎜(LEFT PARENTHESIS EXTENSION, U+239C)
+"    (looks more on the left in macOS character viewer)
+" ⎢(LEFT SQUARE BRACKET EXTENSION, U+23A2)
+" set listchars=tab:>-,nbsp:¬,extends:»,precedes:«,trail:·
 
 set fileencodings=ucs-bom,utf-8,gbk,default,latin1
 
 command! -nargs=* Wrap set wrap linebreak nolist
-" set formatoptions=tc
-" set fo+=a
+" set formatoptions=jatcroql
 " set textwidth=80
 set linebreak
+
+nnoremap <leader>w :call ToggleWrapping()<CR>
+function! ToggleWrapping()
+  if &fo =~ 'a'
+    set fo-=a
+    echo "Text Wrapping Off"
+  else
+    set fo+=a
+    echo "Text Wrapping On"
+  endif
+endfunction
 
 " https://andrew.stwrt.ca/posts/project-specific-vimrc/
 set exrc
@@ -105,7 +122,7 @@ let g:ale_set_loclist = 0   " Wired settings
 " let g:airline#extensions#ale#enabled = 1
 " let g:ale_completion_enabled = 1
 nnoremap <silent> K :ALEHover<CR>
-nnoremap <silent> gd :ALEGoToDefinition<CR>
+" nnoremap <silent> gd :ALEGoToDefinition<CR>
 nnoremap <silent> gr :ALEFindReferences<CR>
 
 func! Cj()
@@ -125,7 +142,7 @@ func! Cj()
         norm! ]c
     elseif &spell
         norm! ]s
-        " Also, remember there are `:z=`, `:zg` and `:zug` commands
+        " Also, remember there are `z=`, `zg` and `zug` commands
     else
         " https://stackoverflow.com/a/18547013
         " It's essential to use the (remapping) :normal
@@ -170,6 +187,10 @@ endif
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 
+" Sublime-like minimap
+" Plug 'wfxr/minimap.vim'
+" let g:minimap_auto_start = 1
+
 " Commenets
 Plug 'scrooloose/nerdcommenter'
 " nmap <M-_> <Plug>NERDComMinimalComment
@@ -201,7 +222,7 @@ let g:AutoPairsShortcutFastWrap = '<A-f>'
 Plug 'danro/rename.vim'
 
 " TabNine
-Plug 'zxqfl/tabnine-vim', { 'for': ['rust', 'c', 'cpp', 'markdown'] }
+" Plug 'zxqfl/tabnine-vim', { 'for': ['rust', 'c', 'cpp', 'markdown'] }
 
 " Rust
 " Plug 'rust-lang/rust.vim', { 'for': 'rust' }
@@ -210,7 +231,7 @@ au BufRead,BufNewFile *.toml setfiletype cfg
 let g:ale_list_window_size = 5
 let g:ale_close_preview_on_insert = 0
 let g:ale_virtualtext_cursor = 1
-let g:ale_linters = {'rust': ['rls'], 'python': ['pyls'], 'c': ['clangd'], 'cpp': ['clangd'], 'json': ['jsonlint']}
+let g:ale_linters = {'rust': ['rustc'], 'python': ['flake8'], 'c': ['clangd'], 'cpp': ['clangd'], 'json': ['jsonlint'], 'javascript': ['eslint']}
 let g:ale_fixers = {'rust': ['rustfmt'], 'python': ['autopep8'], 'json': ['fixjson']}
 let g:ale_fix_on_save = 1
 let g:ale_rust_rustc_options = '-Z no-codegen --edition 2018'
@@ -282,10 +303,15 @@ Plug 'Twinklebear/ispc.vim', { 'for': ['ispc'] }
 " Fish
 Plug 'dag/vim-fish', { 'for': 'fish' }
 
-" Fuzzy finder
+" Change root to git working dir, excluding (default) Makefile
 Plug 'airblade/vim-rooter'
+let g:rooter_patterns = ['.git', '_darcs', '.hg', '.bzr', '.svn']
+
+" Fuzzy finder
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
+let g:fzf_colors = { 'border': ['fg', 'Label'] }
+
 " Files
 map <C-p> :Files<CR>
 nmap <leader>b :Buffers<CR>
@@ -332,6 +358,15 @@ let g:deoplete#sources#rust#show_duplicates=0
 Plug 'chrisbra/Colorizer', { 'for': ['css', 'html'], 'on': 'ColorToggle' }
 " let g:colorizer_auto_color = 1
 let g:colorizer_auto_filetype='css,html'
+nnoremap <leader>c :ColorToggle<CR>
+
+" Web dev
+Plug 'mattn/emmet-vim'
+let g:user_emmet_leader_key=','
+let g:user_emmet_install_global = 0
+autocmd FileType html,css EmmetInstall
+
+" Plug 'vim-scripts/AutoComplPop'
 
 " Color Scheme
 " kaicataldo's
@@ -354,7 +389,7 @@ if has("nvim")
     let g:suda#prefix = 'suda://'
     " multiple protocols can be defined too
     let g:suda#prefix = ['suda://', 'sudo://', '_://']
-    let g:suda_smart_edit = 1
+    " let g:suda_smart_edit = 1
 end
 
 call plug#end()
@@ -367,6 +402,8 @@ call plug#end()
 
 " Color Scheme
 " colorscheme delek
+" peachpuff
+" morning
 """ kaicataldo's material (seems to not support non-gui)
 set background=dark
 colorscheme material
@@ -414,6 +451,7 @@ let g:racer_insert_paren = 1
 
 
 " Build
+au Filetype *tex setfiletype tex
 au FileType *tex nnoremap <A-b> :w<CR> :!pdflatex -halt-on-error -shell-escape %<CR>
 " au FileType *tex nnoremap <A-b> :w<CR> :!bibtex report && pdflatex -halt-on-error -shell-escape %<CR>
 " au FileType *tex nnoremap <A-b> :w<CR> :!xelatex -halt-on-error -shell-escape %<CR>
@@ -421,11 +459,23 @@ au FileType *tex ALEDisable
 " Spell check
 au FileType *tex setlocal spell spelllang=en_us,cjk
 au FileType markdown setlocal spell spelllang=en_us,cjk
-" au FileType text setlocal spell spelllang=en_us,cjk
+au FileType text setlocal spell spelllang=en_us,cjk
+au FileType gitcommit setlocal spell spelllang=en_us,cjk
 " text auto wrapping
 " au FileType *tex set textwidth=80
 " au FileType text set textwidth=80
 let g:airline#extensions#wordcount#filetypes = ['asciidoc', 'help', 'mail', 'markdown', 'org', 'rst', 'tex', 'text', 'plaintex']
+
+" Auto update `lastMod` for Hugo and keep correct position
+func! UpdateLastMod()
+    " Only when modified and not template
+    if &modified && expand('%:t') != 'default.md'
+        let save_cursor = getpos(".")
+        exe '%s/^lastMod:.*$/lastMod: ' . strftime('%FT%T%z') . '/e'
+        call setpos('.', save_cursor)
+    endif
+endfunction
+au FileType markdown aut BufWritePre * call UpdateLastMod()
 
 """ Key mappings
 
@@ -449,7 +499,7 @@ nnoremap <M-tab>   :bnext<CR>
 " Work around for iPadOS, DK why it send 'tab' instead of '\[tab'.
 nnoremap <F11>     :bnext<CR>
 nnoremap <silent> <M-w> :call CloseBuf()<CR>
-nnoremap <C-t>     :tabnew<CR>
+" nnoremap <C-t>     :tabnew<CR>
 " inoremap <c-s-tab> <Esc>:tabprevious<cr>
 " inoremap <c-tab>   <Esc>:tabnext<cr>
 nnoremap <S-Tab>   :tabprevious<CR>
@@ -480,8 +530,11 @@ endif
 
 " Identation
 set tabstop=4 softtabstop=4 shiftwidth=4 expandtab autoindent
-au FileType json set tabstop=2 softtabstop=2 shiftwidth=2
+" set tabstop=8 softtabstop=8 shiftwidth=8 autoindent
+au FileType java,json,html,javascript,tex,markdown,gitcommit set tabstop=8 softtabstop=2 shiftwidth=2 expandtab
 " set tabstop=4 shiftwidth=4
+" Also see `:retab` command
+" To insert a real tab when 'expandtab' is on, use CTRL-V<Tab>.
 
 " Delete
 nnoremap <BS> h"_x
@@ -504,7 +557,7 @@ vnoremap <C-c> <Esc>
 onoremap <C-c> <Esc>
 nnoremap <C-c> :noh<return>
 " Exit search
-nnoremap <esc> :noh<return>
+" nnoremap <esc> :noh<return> " Causing some vim to have a `c` after starting
 endif " Vim Plug, WT? why vim does not parse the above map correctly
 " Hardmode
 " inoremap <UP> <NOP>
@@ -527,6 +580,18 @@ nnoremap <silent> g^ ^
 nnoremap <silent> g$ $
 set whichwrap+=<,>,[,],h,l
 
+cnoremap <C-A> <Home>
+cnoremap <C-B> <Left>
+cnoremap <C-D> <Del>
+cnoremap <C-E> <End>
+cnoremap <C-F> <Right>
+cnoremap <C-N> <Down>
+cnoremap <C-P> <Up>
+" cnoremap <Esc>b <S-Left>
+" cnoremap <Esc>f <S-Right>
+cnoremap <Esc><C-B> <S-Left>
+cnoremap <Esc><C-F> <S-Right>
+
 " Clipboard
 " vnoremap <M-c> :w !pbcopy<CR><CR>
 " * for PRIMARY (selection), + for CLIPBOARD (C-c/C-v), see *quotestar*
@@ -538,9 +603,11 @@ autocmd InsertLeave * set nopaste
 
 " Axis
 highlight MatchParen term=underline cterm=underline ctermbg=NONE gui=underline guibg=NONE
-" set fcs=eob:\   " Do not show ~ for EOB in nvim. Note that it's a backslash whitespace.
-hi NonText guifg=bg
+if has('nvim')
+set fcs=eob:\   " Do not show ~ for EOB in nvim. Note that it's a backslash whitespace.
+endif
 set colorcolumn=80
+" highlight EndOfBuffer ctermfg=black ctermbg=black
 
 " Goto last closed position
 " Copied from default.vim
@@ -565,6 +632,7 @@ func! TrimWhiteSpace()
     call cursor(l, c)
 endfunction
 command! TrimWhiteSpace call TrimWhiteSpace()
+" Also see `:retab` command
 
 " https://vim.fandom.com/wiki/Search_for_visually_selected_text
 " Search for selected text, forwards or backwards.
