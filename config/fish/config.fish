@@ -3,10 +3,17 @@ source $HOME/.cargo/env
 [ -f /usr/share/autojump/autojump.fish ]; and source /usr/share/autojump/autojump.fish
 # source /etc/modules/init/fish
 # export PATH="$PATH:/usr/lib/jvm/default/bin"
+[ -f /usr/local/opt/modules/init/fish ]; and source /usr/local/opt/modules/init/fish
+[ -f /etc/module/init/fish ]; and source /usr/local/opt/modules/init/fish
+export MODULESPATH=$HOME/software/modulefiles
 
 if [ (uname -s) = "Darwin" ]
-    set -x HOMEBREW_BOTTLE_DOMAIN https://mirrors.ustc.edu.cn/homebrew-bottles
+    # set -x HOMEBREW_BOTTLE_DOMAIN https://mirrors.ustc.edu.cn/homebrew-bottles
     # set -x HOMEBREW_BOTTLE_DOMAIN https://mirrors.geekpie.club/homebrew-bottles
+    set HB_CNF_HANDLER (brew --repository)"/Library/Taps/homebrew/homebrew-command-not-found/handler.fish"
+    if test -f $HB_CNF_HANDLER
+        source $HB_CNF_HANDLER
+    end
 end
 alias py="ipython"
 alias py3="ipython3"
@@ -18,14 +25,15 @@ if [ (uname -s) = "Darwin" ]
 alias tac gtac
 alias head ghead
 alias readelf greadelf
+alias ldd 'otool -L'
 end
 
-alias swift='env PATH="/usr/bin:$PATH" swift'
-alias rust-lldb='env PATH="/usr/bin:$PATH" rust-lldb'
-alias rust-gdb='env PATH="/usr/bin:$PATH" rust-gdb'
-alias lldb='env PATH="/usr/bin:$PATH" lldb'
+# alias swift='env PATH="/usr/bin:$PATH" swift'
+# alias rust-lldb='env PATH="/usr/bin:$PATH" rust-lldb'
+# alias rust-gdb='env PATH="/usr/bin:$PATH" rust-gdb'
+# alias lldb='env PATH="/usr/bin:$PATH" lldb'
 
-# eval $(/usr/local/bin/thefuck --alias)
+# /usr/local/bin/thefuck --alias | source
 
 set -x RUST_SRC_PATH (rustc --print sysroot)"/lib/rustlib/src/rust/src"
 
@@ -43,6 +51,7 @@ if [ (uname -s) = "Darwin" ]
 set -x -p PATH "/usr/local/opt/qt/bin"
 set -x -p PATH "/usr/local/opt/bc/bin"
 set -x -p PATH "/usr/local/opt/file-formula/bin"
+set -x -p PATH "/usr/local/texlive/2016/bin/x86_64-darwin/latex"
 end
 set -x -p PATH "$HOME/.myutils/bin/"
 set -x -p PATH "$HOME/.local/bin/"
@@ -63,7 +72,7 @@ alias 2='prevd 2'
 #alias 7='cd -7'
 #alias 8='cd -8'
 #alias 9='cd -9'
-alias md='mkdir -p'
+abbr md mkdir -p
 
 set -x GPG_TTY (tty)
 
@@ -79,7 +88,7 @@ else
     alias tlmgr '/usr/share/texmf-dist/scripts/texlive/tlmgr.pl --usermode'
 end
 
-set -x LESS '-R --mouse'
+# set -x LESS '-R --mouse'
 set -x EDITOR 'nvim'
 
 function hybrid_bindings --description "Vi-style bindings that inherit emacs-style bindings in all modes"
@@ -97,6 +106,7 @@ set -g fish_key_bindings hybrid_bindings
 #     exa -lgaa $argv
 # end
 abbr ls exa
+abbr l exa
 function ll --description 'Using exa for ll'
     exa -lg $argv
 end
@@ -115,6 +125,9 @@ end
 
 abbr du dua
 abbr cat bat
+
+#alias less='bat --paging=always'
+alias tless='tmux splitw -dI'  # Usage: make 2>&1 | tless &
 
 starship init fish | source
 
