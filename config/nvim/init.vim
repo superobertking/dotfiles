@@ -1,3 +1,4 @@
+" vim: sts=4:sw=4:et
 " File: .vimrc
 " Author: robertking <superobertking@icloud.com>
 " Date: 12/04/2019
@@ -97,6 +98,12 @@ let g:airline#extensions#tabline#ignore_bufadd_pat =
 
 " Start screen
 Plug 'mhinz/vim-startify'
+let g:startify_session_persistence = 1
+let g:startify_session_persistence = 1
+let g:startify_bookmarks = [
+    \ {'c': '~/.vimrc'},
+    \ {'f': '~/.config/fish/config.fish'},
+    \ ]
 
 " Go to specific line&col. I'd love it be built-in.
 Plug 'wsdjeg/vim-fetch'
@@ -120,9 +127,12 @@ Plug 'dense-analysis/ale'
 let g:ale_set_balloons = 1
 let g:ale_set_loclist = 0   " Wired settings
 " let g:airline#extensions#ale#enabled = 1
-" let g:ale_completion_enabled = 1
+let g:ale_completion_enabled = 1
+" let g:ale_floating_preview = 1
+" let g:ale_hover_to_preview = 1
+" let g:ale_keep_list_window_open = 1
 nnoremap <silent> K :ALEHover<CR>
-" nnoremap <silent> gd :ALEGoToDefinition<CR>
+nnoremap <silent> gd :ALEGoToDefinition<CR>
 nnoremap <silent> gr :ALEFindReferences<CR>
 
 func! Cj()
@@ -190,6 +200,7 @@ Plug 'airblade/vim-gitgutter'
 " Sublime-like minimap
 " Plug 'wfxr/minimap.vim'
 " let g:minimap_auto_start = 1
+nnoremap <leader>km  :MinimapToggle<CR>
 
 " Commenets
 Plug 'scrooloose/nerdcommenter'
@@ -231,7 +242,7 @@ au BufRead,BufNewFile *.toml setfiletype cfg
 let g:ale_list_window_size = 5
 let g:ale_close_preview_on_insert = 0
 let g:ale_virtualtext_cursor = 1
-let g:ale_linters = {'rust': ['rustc'], 'python': ['flake8'], 'c': ['clangd'], 'cpp': ['clangd'], 'json': ['jsonlint'], 'javascript': ['eslint']}
+let g:ale_linters = {'rust': ['rustc'], 'python': ['flake8'], 'c': ['clangd'], 'cpp': ['clangd'], 'json': ['jsonlint'], 'javascript': ['eslint'], 'ocaml': ['merlin']}
 let g:ale_fixers = {'rust': ['rustfmt'], 'python': ['autopep8'], 'json': ['fixjson']}
 let g:ale_fix_on_save = 1
 let g:ale_rust_rustc_options = '-Z no-codegen --edition 2018'
@@ -248,9 +259,14 @@ let g:ale_rust_rls_config = {
       \     'racer_completion': 'false'
       \   }
       \ }
-let g:ale_sign_error = '✖'
-let g:ale_sign_warning = '⚠'  " cannot seen via mosh
-" let g:ale_sign_warning = '!'
+if 1
+    let g:ale_sign_error = '✖'
+    let g:ale_sign_warning = '⚠'  " cannot seen via mosh
+else
+    " let g:ale_sign_error = 'x'
+    let g:ale_sign_error = '✗'
+    let g:ale_sign_warning = '!'
+endif
 " I wanted a red sign for error and a blue sign for warning. In the material
 " theme we could use `Question` for blue.
 hi link ALEErrorSign    Error
@@ -311,14 +327,18 @@ let g:rooter_patterns = ['.git', '_darcs', '.hg', '.bzr', '.svn']
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 let g:fzf_colors = { 'border': ['fg', 'Label'] }
+let g:fzf_tags_command = 'ctags -R --languages=c,c++'
 
 " Files
-map <C-p> :Files<CR>
+map <leader>kp :Files<CR>
+map <C-p> :GFiles<CR>
 nmap <leader>b :Buffers<CR>
 " Workaround to have this trailing space in command
-nmap <leader>r :Rg  <BS>
-xmap <leader>r y:Rg <C-R>=escape(@",'/\')<CR>
+nmap <leader>f :Rg  <BS>
+xmap <leader>f y:Rg <C-R>=escape(@",'/\')<CR>
 nmap <leader>m :Marks<CR>
+nmap <leader>r :Tags<CR>
+nmap <leader>kr :BTags<CR>
 
 " Quick alignment
 Plug 'junegunn/vim-easy-align'
@@ -411,7 +431,7 @@ colorscheme material
 " colorscheme vim-material
 """ space-vim-dark
 " colorscheme space-vim-dark
-hi Comment cterm=italic guifg=#5C6370 ctermfg=59
+" hi Comment cterm=italic guifg=#5C6370 ctermfg=59
 
 " Old terminal and old mosh does not support 24-bit  color (HEAD mosh already
 " supports 24-bit color)
@@ -457,10 +477,7 @@ au FileType *tex nnoremap <A-b> :w<CR> :!pdflatex -halt-on-error -shell-escape %
 " au FileType *tex nnoremap <A-b> :w<CR> :!xelatex -halt-on-error -shell-escape %<CR>
 au FileType *tex ALEDisable
 " Spell check
-au FileType *tex setlocal spell spelllang=en_us,cjk
-au FileType markdown setlocal spell spelllang=en_us,cjk
-au FileType text setlocal spell spelllang=en_us,cjk
-au FileType gitcommit setlocal spell spelllang=en_us,cjk
+au FileType *tex,markdown,text,gitcommit setlocal spell spelllang=en_us,cjk
 " text auto wrapping
 " au FileType *tex set textwidth=80
 " au FileType text set textwidth=80
@@ -496,6 +513,7 @@ inoremap <A-q>     <Esc>:bprevious<CR>
 inoremap <A-tab>   <Esc>:bnext<CR>
 nnoremap <M-q>     :bprevious<CR>
 nnoremap <M-tab>   :bnext<CR>
+" Also, <C-6> is going to previous edited buffer
 " Work around for iPadOS, DK why it send 'tab' instead of '\[tab'.
 nnoremap <F11>     :bnext<CR>
 nnoremap <silent> <M-w> :call CloseBuf()<CR>
@@ -529,10 +547,12 @@ tnoremap <C-w><C-c> <NOP>
 endif
 
 " Identation
-set tabstop=4 softtabstop=4 shiftwidth=4 expandtab autoindent
-" set tabstop=8 softtabstop=8 shiftwidth=8 autoindent
-au FileType java,json,html,javascript,tex,markdown,gitcommit set tabstop=8 softtabstop=2 shiftwidth=2 expandtab
-" set tabstop=4 shiftwidth=4
+set autoindent
+set tabstop=8
+set softtabstop=4 shiftwidth=4 expandtab
+" set softtabstop=8 shiftwidth=8 noexpandtab
+au FileType java,json,html,javascript,tex,markdown,gitcommit set softtabstop=2 shiftwidth=2 expandtab
+au FileType ocaml set softtabstop=2 shiftwidth=2 expandtab
 " Also see `:retab` command
 " To insert a real tab when 'expandtab' is on, use CTRL-V<Tab>.
 
@@ -600,6 +620,13 @@ noremap <leader>p "+p
 noremap <leader>Y "*y
 noremap <leader>P "*p
 autocmd InsertLeave * set nopaste
+
+" Avoid ':q' directly when there are more buffers, because restarting session
+" would be wasteful.
+cnoremap <silent><expr> <CR>
+    \ getcmdtype() == ":" && index(["q"], getcmdline()) >= 0
+    \ && len(getbufinfo({'buflisted':1})) > 2 && winnr('$') == 1 && tabpagenr('$') == 1
+    \ ? "<C-c>:echo 'Many buffers left! Use :qa.'<CR>" : "<CR>"
 
 " Axis
 highlight MatchParen term=underline cterm=underline ctermbg=NONE gui=underline guibg=NONE
