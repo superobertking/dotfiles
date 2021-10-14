@@ -122,18 +122,20 @@ autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
 nmap <C-n> :NERDTreeToggle<CR>
 
-" Dynamic Linting
-Plug 'dense-analysis/ale'
-let g:ale_set_balloons = 1
-let g:ale_set_loclist = 0   " Wired settings
-" let g:airline#extensions#ale#enabled = 1
-let g:ale_completion_enabled = 1
-" let g:ale_floating_preview = 1
-" let g:ale_hover_to_preview = 1
-" let g:ale_keep_list_window_open = 1
-nnoremap <silent> K :ALEHover<CR>
-nnoremap <silent> gd :ALEGoToDefinition<CR>
-nnoremap <silent> gr :ALEFindReferences<CR>
+" LSP server
+if has('nvim')
+    Plug 'neovim/nvim-lspconfig'
+    Plug 'nvim-lua/completion-nvim'
+else
+    Plug 'dense-analysis/ale'
+    let g:ale_set_balloons = 1
+    let g:ale_set_loclist = 0   " Wired settings
+    " let g:airline#extensions#ale#enabled = 1
+    let g:ale_completion_enabled = 1
+    " let g:ale_floating_preview = 1
+    " let g:ale_hover_to_preview = 1
+    " let g:ale_keep_list_window_open = 1
+endif
 
 func! Cj()
     if len(filter(getwininfo(), 'v:val.quickfix && !v:val.loclist')) != 0
@@ -156,7 +158,8 @@ func! Cj()
     else
         " https://stackoverflow.com/a/18547013
         " It's essential to use the (remapping) :normal
-        exe "norm \<Plug>(ale_next_wrap)"
+        lua vim.lsp.diagnostic.goto_next({enable_popup=false})
+        " exe "norm \<Plug>(ale_next_wrap)"
     endif
 endfunction
 
@@ -173,7 +176,8 @@ func! Ck()
     elseif &spell
         norm! [s
     else
-        exe "norm \<Plug>(ale_previous_wrap)"
+        lua vim.lsp.diagnostic.goto_prev({enable_popup=false})
+        " exe "norm \<Plug>(ale_previous_wrap)"
     endif
 endfunction
 
@@ -239,6 +243,15 @@ Plug 'danro/rename.vim'
 " Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 au BufRead,BufNewFile *.toml setfiletype cfg
 " Plug 'racer-rust/vim-racer', { 'for': 'rust' }
+
+
+" ALE settings begin
+if !has('nvim')
+
+nnoremap <silent> K :ALEHover<CR>
+nnoremap <silent> gd :ALEGoToDefinition<CR>
+nnoremap <silent> gr :ALEFindReferences<CR>
+
 let g:ale_list_window_size = 5
 let g:ale_close_preview_on_insert = 0
 let g:ale_virtualtext_cursor = 1
@@ -273,6 +286,8 @@ hi link ALEErrorSign    Error
 hi link ALEWarningSign  Question
 hi link ALEVirtualTextError     Error
 hi link ALEVirtualTextWarning   Question
+
+endif  " ALE settings end
 
 " Rust tags
 " autocmd BufRead *.rs :setlocal tags=./rusty-tags.vi;/,$RUST_SRC_PATH/rusty-tags.vi
@@ -326,6 +341,7 @@ let g:rooter_patterns = ['.git', '_darcs', '.hg', '.bzr', '.svn']
 " Fuzzy finder
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
+Plug 'ojroques/nvim-lspfuzzy'
 let g:fzf_colors = { 'border': ['fg', 'Label'] }
 let g:fzf_tags_command = 'ctags -R --languages=c,c++'
 
@@ -446,9 +462,90 @@ if (has("termguicolors"))
 endif
 endif
 
-" Completion settings
-" autocmd BufEnter * call ncm2#enable_for_buffer()
-" set completeopt=noinsert,menuone,noselect
+set completeopt=menuone,noinsert,noselect
+
+" LSP settings
+if has('nvim')
+
+" I wanted a red sign for error and a blue sign for warning. In the material
+" theme we could use `Question` for blue.
+hi link LspDiagnosticsDefaultError    Error
+hi link LspDiagnosticsDefaultWarning  Question
+
+lua << EOF
+local nvim_lsp = require('lspconfig')
+local nvim_complete = require('completion')
+require('lspfuzzy').setup{}
+
+-- Use an on_attach function to only map the following keys
+-- after the language server attaches to the current buffer
+local on_attach = function(client, bufnr)
+  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+
+  -- Enable completion triggered by <c-x><c-o>
+  buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+  -- Mappings.
+  local opts = { noremap=true, silent=true }
+
+  -- See `:help vim.lsp.*` for documentation on any of the below functions
+  buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', '<C-w>d', '<C-w>v<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  buf_set_keymap('n', '<leader>R', '<cmd>lua vim.lsp.buf.workspace_symbol()<CR>', opts)
+  -- buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  -- buf_set_keymap('n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+  -- buf_set_keymap('n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+  -- buf_set_keymap('n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+  -- buf_set_keymap('n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+  -- buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  -- buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  buf_set_keymap('n', '<leader>K', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+  -- buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+  -- buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  buf_set_keymap('n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+  -- buf_set_keymap('n', '<leader>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+
+  nvim_complete.on_attach()
+
+end
+
+-- Use a loop to conveniently call 'setup' on multiple servers and
+-- map buffer local keybindings when the language server attaches
+local servers = { 'clangd', 'rust_analyzer' }
+for _, lsp in ipairs(servers) do
+  nvim_lsp[lsp].setup {
+    on_attach = on_attach,
+    flags = {
+      debounce_text_changes = 150,
+    }
+  }
+end
+nvim_lsp.ocamllsp.setup {
+  on_attach = on_attach,
+  flags = {
+    debounce_text_changes = 150,
+  },
+  --root_dir = nvim_lsp.util.root_pattern("dune", "*.opam", "esy.json", "package.json", ".git")
+}
+
+-- Signs
+local signs = { Error = "✖ ", Warning = "⚠ ", Hint = "i ", Information = "i " }
+-- local signs = { Error = "✗ ", Warning = "! ", Hint = "i ", Information = "i " }
+
+for type, icon in pairs(signs) do
+  local hl = "LspDiagnosticsSign" .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+end
+EOF
+
+endif
+
 
 " Color
 " highlight Pmenu ctermbg=grey
@@ -475,7 +572,9 @@ au Filetype *tex setfiletype tex
 au FileType *tex nnoremap <A-b> :w<CR> :!pdflatex -halt-on-error -shell-escape %<CR>
 " au FileType *tex nnoremap <A-b> :w<CR> :!bibtex report && pdflatex -halt-on-error -shell-escape %<CR>
 " au FileType *tex nnoremap <A-b> :w<CR> :!xelatex -halt-on-error -shell-escape %<CR>
+if !has('nvim')
 au FileType *tex ALEDisable
+endif
 " Spell check
 au FileType *tex,markdown,text,gitcommit setlocal spell spelllang=en_us,cjk
 " text auto wrapping
